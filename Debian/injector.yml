@@ -22,4 +22,4 @@
       copy: src=users.csv dest=/tmp/users.csv
 
     - name: run opush-benchmark
-      shell: "opush-benchmark --csv /tmp/users.csv --user-domain obm.lyon.lan --base-url https://$OBM_PORT_443_TCP_ADDR --users-per-sec 2 --duration 1 --duration-unit minutes"
+      shell: "opush-benchmark --csv /tmp/users.csv --user-domain {{domain}} --base-url https://$OBM_PORT_443_TCP_ADDR --users-per-sec 2 --duration 1 --duration-unit minutes"

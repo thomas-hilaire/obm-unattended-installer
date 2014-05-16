@@ -49,6 +49,9 @@ Vagrant.configure("2") do |config|
     vagrant.vm.provision "ansible" do |ansible|
       ansible.playbook = "Debian/injector.yml"
       ansible.verbose = "vvvv"
+      unless (ENV['OBM_DOMAIN'].nil?)
+        ansible.extra_vars = {domain: ENV['OBM_DOMAIN']}
+      end
     end
   end
 
