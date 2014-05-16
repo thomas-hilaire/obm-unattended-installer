@@ -9,14 +9,12 @@
         - python-software-properties
         - wget
 
-    - name: download obm.org gpg key
-      action: command /usr/bin/wget -q  http://deb.obm.org/obmgpg.pub
-
-    - name: install obm.org key
-      action: command /usr/bin/apt-key add obmgpg.pub
+    - name: install obm.org gpg key
+      action: shell wget -qO- http://deb.obm.org/obmgpg.pub | apt-key add -
 
     - name: add obm repository
       apt_repository: repo='deb http://deb.obm.org/30/next obm obm' state=present
+
     - name: remove exim
       action: command /usr/bin/apt-get remove -y exim4 exim4-config
 
@@ -27,6 +25,41 @@
       action: command debconf-set-selections /tmp/debconf
 
     - name: install obm
-      action: command /usr/bin/apt-get install -y obm obm-sync
+      apt: pkg={{item}}
+      with_items:
+        - obm
+        - obm-sync
 
+    - name: install cassandra key
+      action: shell wget -qO- http://debian.datastax.com/debian/repo_key | apt-key add -
 
+    - name: add cassandra repository
+      apt_repository: repo='deb http://debian.datastax.com/community stable main' state=present
+
+    - name: install cassandra
+      apt: pkg={{item}}
+      with_items:
+        - openjdk-7-jre-headless
+        - dsc20
+
+    - name: change cassandra authenticator
+      action: 'shell sed -i "s/^authenticator: AllowAllAuthenticator$/authenticator: PasswordAuthenticator/" /etc/cassandra/cassandra.yaml'
+
+    - name: restart cassandra
+      service: name=cassandra state=restarted
+
+    - name: copy cassandra init script
+      copy: src=init.cql dest=/init.cql
+
+    - name: install cassandra init script
+      action: shell cqlsh -u cassandra -p cassandra -f /init.cql localhost
+      register: result
+      retries: 20
+      delay: 1
+      until: result.rc == 0
+      
+    - name: add opush repository
+      apt_repository: repo='deb http://deb.obm.org/opush/stable opush opush' state=present
+
+    - name: install opush
+      apt: pkg=opush

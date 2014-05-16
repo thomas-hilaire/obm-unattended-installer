@@ -1,3 +1,10 @@
+# Opush configuration
+opush		opush/syncperms			select		true
+opush		opush/cassandra-seeds		string		127.0.0.1
+opush		opush/cassandra-keyspace	string		opush
+opush		opush/cassandra-user		string		opush
+opush		opush/cassandra-pwd		password	opush
+opush		opush/cassandra-pwd-verify	password	opush
 obm-storage	obm-storage/app-password-confirm	password	
 obm-storage	obm-storage/pgsql/admin-pass	password	
 obm-conf	obm-conf/dbpasswd	password	obmdatabase
