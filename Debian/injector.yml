@@ -1,0 +1,25 @@
+---
+
+- hosts: all
+
+  tasks:
+    - name: install needed tools
+      apt: pkg={{item}}
+      with_items:
+        - python-software-properties
+        - wget
+
+    - name: install obm.org gpg key
+      action: shell wget -qO- http://deb.obm.org/obmgpg.pub | apt-key add -
+
+    - name: add opush repository
+      apt_repository: repo='deb http://deb.obm.org/opush/unstable opush opush' state=present
+
+    - name: install opush-benchmark
+      apt: pkg=opush-benchmark
+
+    - name: copy user csv
+      copy: src=users.csv dest=/tmp/users.csv
+
+    - name: run opush-benchmark
+      shell: "opush-benchmark --csv /tmp/users.csv --user-domain obm.lyon.lan --base-url https://$OBM_PORT_443_TCP_ADDR --users-per-sec 2 --duration 1 --duration-unit minutes"

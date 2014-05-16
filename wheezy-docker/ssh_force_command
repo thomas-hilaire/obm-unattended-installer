@@ -1,0 +1,5 @@
+#! /bin/sh
+
+. /etc/ssh/export_docker_env.sh
+
+/bin/sh -c "$SSH_ORIGINAL_COMMAND"
